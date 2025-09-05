@@ -1,250 +1,193 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const SignUpForm = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    agreeToTerms: false
-  });
-  
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-  
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    else if (formData.firstName.trim().length < 2) newErrors.firstName = 'First name must be at least 2 characters';
-    
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    else if (formData.lastName.trim().length < 2) newErrors.lastName = 'Last name must be at least 2 characters';
-    
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
-    }
-    
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms';
-    }
-    
-    return newErrors;
-  };
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = validateForm();
-    
-    if (Object.keys(newErrors).length === 0) {
-      // Form is valid, proceed with submission
-      alert('Account created successfully!');
-      console.log('Form data:', formData);
-      
-      // Reset form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        agreeToTerms: false
-      });
-    } else {
-      setErrors(newErrors);
-    }
-  };
-  
-  const togglePasswordVisibility = () => {
-    setShowPassword(prev => !prev);
-  };
-  
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(prev => !prev);
-  };
-  
+const Signup = ({ formData, errors, onChange, onSubmit }) => {
   return (
-    <form onSubmit={handleSubmit} className="needs-validation" noValidate>
-      <div className="row">
-        <div className="col-md-6 mb-3">
-          <label htmlFor="firstName" className="form-label">First Name</label>
-          <div className="input-group">
-            <span className="input-group-text"><i className="fas fa-user"></i></span>
-            <input 
-              type="text" 
-              className={`form-control with-icon ${errors.firstName ? 'is-invalid' : ''}`}
-              id="firstName" 
-              name="firstName"
-              placeholder="Enter your first name" 
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          {errors.firstName && <div className="error-message">{errors.firstName}</div>}
-        </div>
-        <div className="col-md-6 mb-3">
-          <label htmlFor="lastName" className="form-label">Last Name</label>
-          <div className="input-group">
-            <span className="input-group-text"><i className="fas fa-user"></i></span>
-            <input 
-              type="text" 
-              className={`form-control with-icon ${errors.lastName ? 'is-invalid' : ''}`}
-              id="lastName" 
-              name="lastName"
-              placeholder="Enter your last name" 
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          {errors.lastName && <div className="error-message">{errors.lastName}</div>}
-        </div>
-      </div>
-      
-      <div className="mb-3">
-        <label htmlFor="email" className="form-label">Email Address</label>
-        <div className="input-group">
-          <span className="input-group-text"><i className="fas fa-envelope"></i></span>
-          <input 
-            type="email" 
-            className={`form-control with-icon ${errors.email ? 'is-invalid' : ''}`}
-            id="email" 
-            name="email"
-            placeholder="Enter your email" 
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        {errors.email && <div className="error-message">{errors.email}</div>}
-      </div>
-      
-      <div className="mb-3">
-        <label htmlFor="password" className="form-label">Password</label>
-        <div className="input-group">
-          <span className="input-group-text"><i className="fas fa-lock"></i></span>
-          <input 
-            type={showPassword ? "text" : "password"}
-            className={`form-control with-icon ${errors.password ? 'is-invalid' : ''}`}
-            id="password" 
-            name="password"
-            placeholder="Create a strong password" 
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          <button 
-            className="btn btn-outline-secondary" 
-            type="button" 
-            onClick={togglePasswordVisibility}
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Create your account
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Or{' '}
+          <Link
+            to="/login"
+            className="font-medium text-indigo-600 hover:text-indigo-500"
           >
-            <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-          </button>
+            sign in to your existing account
+          </Link>
+        </p>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={onSubmit}>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                  First name
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    value={formData.firstName}
+                    onChange={onChange}
+                    className={`appearance-none block w-full px-3 py-2 border ${
+                      errors.firstName ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  />
+                  {errors.firstName && (
+                    <p className="mt-2 text-sm text-red-600">{errors.firstName}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                  Last name
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    value={formData.lastName}
+                    onChange={onChange}
+                    className={`appearance-none block w-full px-3 py-2 border ${
+                      errors.lastName ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  />
+                  {errors.lastName && (
+                    <p className="mt-2 text-sm text-red-600">{errors.lastName}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={onChange}
+                  className={`appearance-none block w-full px-3 py-2 border ${
+                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  } rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                />
+                {errors.email && (
+                  <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={onChange}
+                  className={`appearance-none block w-full px-3 py-2 border ${
+                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  } rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                />
+                {errors.password && (
+                  <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={onChange}
+                  className={`appearance-none block w-full px-3 py-2 border ${
+                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                  } rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                />
+                {errors.confirmPassword && (
+                  <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="agreeToTerms"
+                name="agreeToTerms"
+                type="checkbox"
+                checked={formData.agreeToTerms}
+                onChange={onChange}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-900">
+                I agree to the{' '}
+                <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                  Terms and Conditions
+                </a>
+              </label>
+            </div>
+            {errors.agreeToTerms && (
+              <p className="text-sm text-red-600">{errors.agreeToTerms}</p>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Sign up
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <span>Google</span>
+              </button>
+              <button
+                type="button"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <span>GitHub</span>
+              </button>
+            </div>
+          </div>
         </div>
-        {errors.password && <div className="error-message">{errors.password}</div>}
-        <div className="password-rules">
-          <small>Use at least 8 characters with a mix of uppercase, lowercase letters and numbers</small>
-        </div>
       </div>
-      
-      <div className="mb-3">
-        <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-        <div className="input-group">
-          <span className="input-group-text"><i className="fas fa-lock"></i></span>
-          <input 
-            type={showConfirmPassword ? "text" : "password"}
-            className={`form-control with-icon ${errors.confirmPassword ? 'is-invalid' : ''}`}
-            id="confirmPassword" 
-            name="confirmPassword"
-            placeholder="Confirm your password" 
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-          <button 
-            className="btn btn-outline-secondary" 
-            type="button" 
-            onClick={toggleConfirmPasswordVisibility}
-          >
-            <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-          </button>
-        </div>
-        {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
-      </div>
-      
-      <div className="mb-3 form-check">
-        <input 
-          type="checkbox" 
-          className={`form-check-input ${errors.agreeToTerms ? 'is-invalid' : ''}`}
-          id="terms" 
-          name="agreeToTerms"
-          checked={formData.agreeToTerms}
-          onChange={handleChange}
-          required
-        />
-        <label className="form-check-label" htmlFor="terms">
-          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-        </label>
-        {errors.agreeToTerms && <div className="error-message">{errors.agreeToTerms}</div>}
-      </div>
-      
-      <button type="submit" className="btn btn-signup w-100 text-white">
-        <i className="fas fa-user-plus me-2"></i>Create Account
-      </button>
-      
-      <div className="divider">
-        <span>Or sign up with</span>
-      </div>
-      
-      <div className="social-login">
-        <button type="button" className="btn social-btn btn-google">
-          <i className="fab fa-google me-2"></i>Google
-        </button>
-        <button type="button" className="btn social-btn btn-facebook">
-          <i className="fab fa-facebook-f me-2"></i>Facebook
-        </button>
-      </div>
-      
-      <div className="login-link">
-        Already have an account? <a href="#">Log In</a>
-      </div>
-    </form>
+    </div>
   );
 };
 
-export default SignUpForm;
+export default Signup;
